@@ -5,6 +5,8 @@ import { prisma } from "./db";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/users";
 import categoryRoutes from "./routes/Categories";
+import transactionRoutes from "./routes/transactions";
+
 dotenv.config({ path: ".env" });
 
 const app = express();
@@ -14,6 +16,8 @@ app.use(express.json());
 app.use("/auth", authRoutes);
 app.use(userRoutes);
 app.use(categoryRoutes);
+app.use(transactionRoutes);
+
 
 
 app.get("/health", async (_req: Request, res: Response) => {

@@ -1,0 +1,2 @@
+ Architecture Decisions:
+“DELETE endpoints return 204 No Content. The frontend API client explicitly handles empty responses to avoid JSON parsing errors.”

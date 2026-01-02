@@ -6,6 +6,8 @@ import DashboardPage from "../src/pages/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import "./index.css";
 import CategoriesPage from "./pages/Categories";
+import TransactionsPage from "./pages/Transactions";
+
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -29,6 +31,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         </ProtectedRoute>
   }
 />
+<Route
+  path="/transactions"
+  element={
+    <ProtectedRoute>
+      <TransactionsPage />
+    </ProtectedRoute>
+  }
+/>
+
 
       </Routes>
     </BrowserRouter>
