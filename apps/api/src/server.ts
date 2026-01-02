@@ -6,6 +6,8 @@ import authRoutes from "./routes/auth";
 import userRoutes from "./routes/users";
 import categoryRoutes from "./routes/Categories";
 import transactionRoutes from "./routes/transactions";
+import summaryRoutes from "./routes/summary";
+
 
 dotenv.config({ path: ".env" });
 
@@ -17,6 +19,7 @@ app.use("/auth", authRoutes);
 app.use(userRoutes);
 app.use(categoryRoutes);
 app.use(transactionRoutes);
+app.use(summaryRoutes);
 
 
 
