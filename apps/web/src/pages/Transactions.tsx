@@ -6,6 +6,7 @@ import {
   deleteTransaction,
   type Tx,
 } from "../features/transactions/transactionsApi";
+import {penniesFromInput, poundsFromPennies} from "../lib/money"
 
 function toYYYYMM(d: Date) {
   const y = d.getFullYear();
@@ -13,17 +14,6 @@ function toYYYYMM(d: Date) {
   return `${y}-${m}`;
 }
 
-function penniesFromPounds(input: string) {
-  // "12.34" -> 1234
-  const normalized = input.replace(",", ".").trim();
-  const n = Number(normalized);
-  if (!Number.isFinite(n) || n <= 0) return null;
-  return Math.round(n * 100);
-}
-
-function poundsFromPennies(p: number) {
-  return (p / 100).toFixed(2);
-}
 
 export default function TransactionsPage() {
   const [month, setMonth] = useState(toYYYYMM(new Date()));
@@ -37,6 +27,8 @@ export default function TransactionsPage() {
   const [amountStr, setAmountStr] = useState("");
   const [dateStr, setDateStr] = useState(() => new Date().toISOString().slice(0, 10)); // YYYY-MM-DD
   const [note, setNote] = useState("");
+  const [filterType, setFilterType] = useState<"" | "income" | "expense">("");
+  const [filterCategoryId, setFilterCategoryId] = useState("");
 
   const filteredCats = useMemo(
     () => cats.filter((c) => c.type === type),
@@ -46,7 +38,12 @@ export default function TransactionsPage() {
   async function refresh(nextMonth = month) {
     const [c, t] = await Promise.all([
       listCategories(),
-      listTransactions({ month: nextMonth }),
+      listTransactions({
+  month: nextMonth,
+  ...(filterType ? { type: filterType } : {}),
+  ...(filterCategoryId ? { categoryId: filterCategoryId } : {}),
+})
+
     ]);
     setCats(c);
     setItems(t);
@@ -58,7 +55,7 @@ export default function TransactionsPage() {
       .catch((e) => setError(e instanceof Error ? e.message : "Failed"))
       .finally(() => setLoading(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [month]);
+  }, [month, filterType, filterCategoryId]);
 
   useEffect(() => {
     // when type changes, pick first matching category
@@ -70,7 +67,7 @@ export default function TransactionsPage() {
     e.preventDefault();
     setError(null);
 
-    const pennies = penniesFromPounds(amountStr);
+    const pennies = penniesFromInput(amountStr);
     if (!pennies) return setError("Enter a valid amount (e.g. 12.34)");
     if (!categoryId) return setError("Select a category");
 
@@ -118,6 +115,57 @@ export default function TransactionsPage() {
           />
         </label>
       </div>
+      <div
+  style={{
+    display: "flex",
+    gap: 12,
+    alignItems: "center",
+    margin: "12px 0",
+    flexWrap: "wrap",
+  }}
+>
+  <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+    Type
+    <select
+      value={filterType}
+      onChange={(e) => setFilterType(e.target.value as any)}
+    >
+      <option value="">All</option>
+      <option value="expense">Expense</option>
+      <option value="income">Income</option>
+    </select>
+  </label>
+  
+  <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
+    Category
+    <select
+      value={filterCategoryId}
+      onChange={(e) => setFilterCategoryId(e.target.value)}
+    >
+      <option value="">All</option>
+      {cats
+        .filter((c) => (filterType ? c.type === filterType : true))
+        .map((c) => (
+          <option key={c.id} value={c.id}>
+            {c.name}
+          </option>
+        ))}
+    </select>
+  </label>
+
+  {(filterType || filterCategoryId) && (
+    <button
+      type="button"
+      onClick={() => {
+        setFilterType("");
+        setFilterCategoryId("");
+      }}
+    >
+      Clear filters
+    </button>
+  )}
+</div>
+
 
       <form onSubmit={onAdd} style={{ border: "1px solid #ddd", borderRadius: 8, padding: 12, marginBottom: 16 }}>
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>

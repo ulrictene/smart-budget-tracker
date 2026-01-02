@@ -1,6 +1,9 @@
 import { Router } from "express";
 import { prisma } from "../db";
 import { requireAuth, type AuthRequest } from "../middleware/requireAuth";
+import { validateBody } from "../middleware/validate";
+import { createTransactionSchema, updateTransactionSchema } from "../schemas/transactions";
+
 
 const router = Router();
 
@@ -52,7 +55,7 @@ router.get("/transactions", requireAuth, async (req: AuthRequest, res) => {
 });
 
 // POST /transactions
-router.post("/transactions", requireAuth, async (req: AuthRequest, res) => {
+router.post("/transactions", requireAuth,validateBody(createTransactionSchema),  async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
     const { categoryId, type, amount, date, note } = req.body as {
@@ -110,7 +113,7 @@ router.post("/transactions", requireAuth, async (req: AuthRequest, res) => {
 });
 
 // PATCH /transactions/:id
-router.patch("/transactions/:id", requireAuth, async (req: AuthRequest, res) => {
+router.patch("/transactions/:id", requireAuth, validateBody(updateTransactionSchema),  async (req: AuthRequest, res) => {
   try {
     const userId = req.userId!;
     const { id } = req.params;

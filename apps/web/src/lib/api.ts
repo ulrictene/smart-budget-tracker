@@ -14,10 +14,17 @@ export async function api<T>(path: string, options: RequestInit = {}): Promise<T
     },
   });
 
-  if (!res.ok) {
-    const message = await res.text();
-    throw new Error(message || `Request failed: ${res.status}`);
+
+    if (!res.ok) {
+    const text = await res.text();
+    try {
+      const parsed = JSON.parse(text);
+      throw new Error(parsed.error || "Request failed");
+    } catch {
+      throw new Error(text || `Request failed: ${res.status}`);
+    }
   }
+
 
   if (res.status === 204) {
     return undefined as T;

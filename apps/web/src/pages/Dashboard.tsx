@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { clearToken } from "../lib/auth";
 import { getMe, type MeResponse } from "../features/meApi";
 import { getSummary, type Summary } from "../features/summary/summaryApi";
+import {poundsFromPennies} from "../lib/money";
 
 import { Doughnut, Line } from "react-chartjs-2";
 import {
@@ -31,10 +32,6 @@ function toYYYYMM(d: Date) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   return `${y}-${m}`;
-}
-
-function pounds(pennies: number) {
-  return `£${(pennies / 100).toFixed(2)}`;
 }
 
 export default function DashboardPage() {
@@ -118,15 +115,15 @@ export default function DashboardPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12, marginBottom: 16 }}>
             <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 14 }}>
               <div style={{ opacity: 0.7 }}>Income</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{pounds(summary.totalIncome)}</div>
+              <div style={{ fontSize: 24, fontWeight: 700 }}>{poundsFromPennies(summary.totalIncome)}</div>
             </div>
             <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 14 }}>
               <div style={{ opacity: 0.7 }}>Expenses</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{pounds(summary.totalExpense)}</div>
+              <div style={{ fontSize: 24, fontWeight: 700 }}>{poundsFromPennies(summary.totalExpense)}</div>
             </div>
             <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 14 }}>
               <div style={{ opacity: 0.7 }}>Net</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{pounds(summary.net)}</div>
+              <div style={{ fontSize: 24, fontWeight: 700 }}>{poundsFromPennies(summary.net)}</div>
             </div>
           </div>
 

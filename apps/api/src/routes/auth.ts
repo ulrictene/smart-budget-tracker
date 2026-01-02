@@ -2,14 +2,18 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import { prisma } from "../db";
 import { signToken } from "../utils/jwt";
+import { validateBody } from "../middleware/validate";
+import { registerSchema, loginSchema } from "../schemas/auth";
+
 
 const router = Router();
 
 /**
  * POST /auth/register
  */
-router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
+router.post("/register", validateBody(registerSchema),  async (req, res) => {
+  const { email, password } = req.body as { email: string; password: string };
+
 
   if (!email || !password) {
     return res.status(400).json({ error: "Email and password required" });
@@ -37,8 +41,8 @@ router.post("/register", async (req, res) => {
 /**
  * POST /auth/login
  */
-router.post("/login", async (req, res) => {
-  const { email, password } = req.body;
+router.post("/login", validateBody(loginSchema), async (req, res) => {
+  const { email, password } = req.body as { email: string; password: string };
 
   const user = await prisma.user.findUnique({
     where: { email },

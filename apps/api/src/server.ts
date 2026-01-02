@@ -20,6 +20,12 @@ app.use(userRoutes);
 app.use(categoryRoutes);
 app.use(transactionRoutes);
 app.use(summaryRoutes);
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: any, _req: any, res: any, _next: any) => {
+  console.error("UNHANDLED_ERROR:", err);
+  res.status(500).json({ error: "InternalServerError" });
+});
+
 
 
 

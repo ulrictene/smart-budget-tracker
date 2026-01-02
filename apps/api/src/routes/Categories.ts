@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { prisma } from "../db";
 import { requireAuth, type AuthRequest } from "../middleware/requireAuth";
+import { validateBody } from "../middleware/validate";
+import { createCategorySchema, updateCategorySchema } from "../schemas/categories";
 
 const router = Router();
 
@@ -16,7 +18,7 @@ router.get("/categories", requireAuth, async (req: AuthRequest, res) => {
 });
 
 // POST /categories
-router.post("/categories", requireAuth, async (req: AuthRequest, res) => {
+router.post("/categories", requireAuth, validateBody(createCategorySchema),async (req: AuthRequest, res) => {
   try {
     const { name, type } = req.body as { name?: string; type?: "income" | "expense" };
 
@@ -45,7 +47,7 @@ router.post("/categories", requireAuth, async (req: AuthRequest, res) => {
 });
 
 // PATCH /categories/:id
-router.patch("/categories/:id", requireAuth, async (req: AuthRequest, res) => {
+router.patch("/categories/:id", requireAuth, validateBody(updateCategorySchema),async (req: AuthRequest, res) => {
   try {
     const { id } = req.params;
     const { name } = req.body as { name?: string };
