@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import { prisma } from "./db";
 import authRoutes from "./routes/auth";
 import userRoutes from "./routes/users";
-
+import categoryRoutes from "./routes/Categories";
 dotenv.config({ path: ".env" });
 
 const app = express();
@@ -13,6 +13,8 @@ app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
 app.use(express.json());
 app.use("/auth", authRoutes);
 app.use(userRoutes);
+app.use(categoryRoutes);
+
 
 app.get("/health", async (_req: Request, res: Response) => {
   try {

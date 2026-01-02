@@ -5,6 +5,7 @@ import LoginPage from "../src/pages/login";
 import DashboardPage from "../src/pages/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import "./index.css";
+import CategoriesPage from "./pages/Categories";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -20,6 +21,15 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
             </ProtectedRoute>
           }
         />
+        <Route
+         path="/categories"
+         element={
+         <ProtectedRoute>
+         <CategoriesPage />
+        </ProtectedRoute>
+  }
+/>
+
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
