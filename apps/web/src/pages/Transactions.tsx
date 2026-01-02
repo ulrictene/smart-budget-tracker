@@ -7,7 +7,8 @@ import {
   type Tx,
 } from "../features/transactions/transactionsApi";
 import {penniesFromInput, poundsFromPennies} from "../lib/money"
-
+import { downloadTransactionsCsv } from "../features/export/exportCsv";
+ 
 function toYYYYMM(d: Date) {
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -115,6 +116,23 @@ export default function TransactionsPage() {
           />
         </label>
       </div>
+      <button
+  type="button"
+  onClick={async () => {
+    try {
+      await downloadTransactionsCsv({
+        month,
+        type: filterType,         
+        categoryId: filterCategoryId,
+      });
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Export failed");
+    }
+  }}
+>
+  Export CSV
+</button>
+
       <div
   style={{
     display: "flex",
@@ -135,7 +153,7 @@ export default function TransactionsPage() {
       <option value="income">Income</option>
     </select>
   </label>
-  
+
   <label style={{ display: "flex", gap: 6, alignItems: "center" }}>
     Category
     <select

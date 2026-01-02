@@ -7,7 +7,7 @@ import userRoutes from "./routes/users";
 import categoryRoutes from "./routes/Categories";
 import transactionRoutes from "./routes/transactions";
 import summaryRoutes from "./routes/summary";
-
+import exportRoutes from "./routes/export";
 
 dotenv.config({ path: ".env" });
 
@@ -20,6 +20,8 @@ app.use(userRoutes);
 app.use(categoryRoutes);
 app.use(transactionRoutes);
 app.use(summaryRoutes);
+app.use(exportRoutes);
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: any, _req: any, res: any, _next: any) => {
   console.error("UNHANDLED_ERROR:", err);
