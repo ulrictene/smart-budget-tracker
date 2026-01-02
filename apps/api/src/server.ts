@@ -8,6 +8,7 @@ import categoryRoutes from "./routes/Categories";
 import transactionRoutes from "./routes/transactions";
 import summaryRoutes from "./routes/summary";
 import exportRoutes from "./routes/export";
+import aiRoutes from "./routes/ai";
 
 dotenv.config({ path: ".env" });
 
@@ -21,6 +22,8 @@ app.use(categoryRoutes);
 app.use(transactionRoutes);
 app.use(summaryRoutes);
 app.use(exportRoutes);
+app.use(aiRoutes);
+
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: any, _req: any, res: any, _next: any) => {
