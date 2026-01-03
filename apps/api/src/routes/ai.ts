@@ -101,7 +101,7 @@ router.get("/ai/summary", requireAuth, async (req: AuthRequest, res) => {
 } catch (err: any) {
   console.error("AI_SUMMARY_ERROR:", err);
 
-  // Handle quota / rate limit cleanly
+  // Handle quota / rate limit 
   if (err?.status === 429 || err?.code === "insufficient_quota") {
     return res.status(200).json({
       month: req.query.month,

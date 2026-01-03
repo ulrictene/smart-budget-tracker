@@ -6,8 +6,10 @@ import { getMe, type MeResponse } from "../features/meApi";
 import { getSummary, type Summary } from "../features/summary/summaryApi";
 import {poundsFromPennies} from "../lib/money";
 import { getAiSummary } from "../features/ai/aiApi";
+import {COLORS} from "../lib/colors";
 
 import { Doughnut, Line } from "react-chartjs-2";
+import type { ChartOptions } from "chart.js";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -84,26 +86,78 @@ const secondsLeft = aiCooldownUntil ? Math.max(0, Math.ceil((aiCooldownUntil - n
   }
 
   const doughnutData = useMemo(() => {
-    const labels = summary?.spendByCategory.map((x) => x.categoryName) ?? [];
-    const values = summary?.spendByCategory.map((x) => x.amount / 100) ?? [];
-    return {
-      labels,
-      datasets: [{ label: "Spend (£)", data: values }],
-    };
-  }, [summary]);
+  if (!summary) return { labels: [], datasets: [] };
 
-  const lineData = useMemo(() => {
-    const labels = summary?.dailyExpense.map((x) => x.date) ?? [];
-    const values = summary?.dailyExpense.map((x) => x.amount / 100) ?? [];
-    return {
-      labels,
-      datasets: [{ label: "Daily spend (£)", data: values }],
-    };
-  }, [summary]);
+  return {
+    labels: summary.spendByCategory.map((x) => x.categoryName),
+    datasets: [
+      {
+        data: summary.spendByCategory.map((x) => x.amount / 100),
+        backgroundColor: COLORS.chart.slice(
+          0,
+          summary.spendByCategory.length
+        ),
+        borderWidth: 1,
+        borderColor: "#ffffff",
+      },
+    ],
+  };
+}, [summary]);
+
+const doughnutOptions = {
+  plugins: {
+    legend: {
+      position: "bottom" as const,
+      labels: {
+        padding: 16,
+        boxWidth: 14,
+        font: { size: 12 },
+      },
+    },
+  },
+};
 
   function isCoolingDown(until: number | null) {
   return until !== null && Date.now() < until;
 }
+const lineData = useMemo(() => {
+  if (!summary) return { labels: [], datasets: [] };
+
+  return {
+    labels: summary.dailyExpense.map((x) => x.date),
+    datasets: [
+      {
+        label: "Daily spend (£)",
+        data: summary.dailyExpense.map((x) => x.amount / 100),
+        borderColor: "#2563eb",
+        backgroundColor: "rgba(37, 99, 235, 0.15)",
+        tension: 0.35,
+        fill: true,
+        pointRadius: 3,
+        pointHoverRadius: 5,
+      },
+    ],
+  };
+}, [summary]);
+
+const lineOptions: ChartOptions<"line"> = {
+  plugins: {
+    legend: { display: false },
+  },
+  scales: {
+    y: {
+      grid: { color: "#f1f5f9" },
+      ticks: {
+        callback: (value) => `£${value}`,
+      },
+    },
+    x: {
+      grid: { display: false },
+    },
+  },
+};
+
+
 
   return (
     <div style={{ maxWidth: 1100, margin: "40px auto", padding: 16 }}>
@@ -129,20 +183,23 @@ const secondsLeft = aiCooldownUntil ? Math.max(0, Math.ceil((aiCooldownUntil - n
         <>
           {/* KPI cards */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 12, marginBottom: 16 }}>
-            <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 14 }}>
-              <div style={{ opacity: 0.7 }}>Income</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{poundsFromPennies(summary.totalIncome)}</div>
-            </div>
-            <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 14 }}>
+            <div style={{border: "1px solid #eee",borderRadius: 12,padding: 16}}>
+           <div style={{ opacity: 0.7 }}>Income</div>
+           <div style={{ fontSize: 26, fontWeight: 700 }}>
+            {poundsFromPennies(summary.totalIncome)}
+          </div>
+          </div>
+
+            <div style={{ border: "1px solid #eee", borderRadius: 12, padding: 16}}>
               <div style={{ opacity: 0.7 }}>Expenses</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{poundsFromPennies(summary.totalExpense)}</div>
+              <div style={{ fontSize: 26, fontWeight: 700}}>{poundsFromPennies(summary.totalExpense)}</div>
             </div>
-            <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 14 }}>
+            <div style={{ border: "1px solid #eee", borderRadius: 12, padding: 16}}>
               <div style={{ opacity: 0.7 }}>Net</div>
-              <div style={{ fontSize: 24, fontWeight: 700 }}>{poundsFromPennies(summary.net)}</div>
+              <div style={{ fontSize: 26, fontWeight: 700 }}>{poundsFromPennies(summary.net)}</div>
             </div>
           </div>
-          <div style={{ marginTop: 16, display: "flex", gap: 10, alignItems: "center" }}>
+          <div style={{ marginTop: 16, marginBottom:16, display: "flex", gap: 10, alignItems: "center" }}>
   <button
   type="button"
   disabled={aiLoading || isCoolingDown(aiCooldownUntil)}
@@ -227,18 +284,18 @@ const secondsLeft = aiCooldownUntil ? Math.max(0, Math.ceil((aiCooldownUntil - n
   </div>
 )}
 
-
-
           {/* Charts */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
             <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 14 }}>
               <h3 style={{ marginTop: 0 }}>Spend by category</h3>
-              {summary.spendByCategory.length ? <Doughnut data={doughnutData} /> : <p>No expense data yet.</p>}
+              {summary.spendByCategory.length ? 
+              <Doughnut data={doughnutData} options={doughnutOptions} />
+              : <p>No expense data yet.</p>}
             </div>
 
             <div style={{ border: "1px solid #eee", borderRadius: 10, padding: 14 }}>
               <h3 style={{ marginTop: 0 }}>Daily spend trend</h3>
-              {summary.dailyExpense.length ? <Line data={lineData} /> : <p>No expense data yet.</p>}
+              {summary.dailyExpense.length ?  <Line data={lineData} options={lineOptions} />: <p>No expense data yet.</p>}
             </div>
           </div>
         </>

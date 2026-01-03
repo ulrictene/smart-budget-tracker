@@ -4,7 +4,6 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "../src/pages/login";
 import DashboardPage from "../src/pages/Dashboard";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import "./index.css";
 import CategoriesPage from "./pages/Categories";
 import TransactionsPage from "./pages/Transactions";
 
@@ -39,8 +38,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     </ProtectedRoute>
   }
 />
-
-
       </Routes>
     </BrowserRouter>
   </React.StrictMode>
